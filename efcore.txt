@@ -1,0 +1,73 @@
+public class EFContext : DbContext
+
+{
+
+    // https://learn.microsoft.com/en-us/ef/core/miscellaneous/nullable-reference-types#dbcontext-and-dbset
+
+    // https://stackoverflow.com/questions/57342964/how-can-i-hint-the-c-sharp-8-0-nullable-reference-system-that-a-property-is-init
+
+    // ReSharper disable once MemberCanBePrivate.Global
+
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
+    public DbSet<EFDirectory> Directories { get; set; } = null!;
+
+    public DbSet<EFFile> Files { get; set; } = null!;
+
+    public DbSet<EFMetadata> Metadata { get; set; } = null!;
+
+    public DbSet<EFTag> Tags { get; set; } = null!;
+
+    public DbSet<EFActor> Actors { get; set; } = null!;
+
+    public DbSet<EFImage> Images { get; set; } = null!;
+
+    public DbSet<EFSerialNumber> SerialNumbers { get; set; } = null!;
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
+
+
+
+📁 Migrations
+
+├── 📄 20230915015544_Initial.cs
+
+├── 📄 20231007022557_AddSerialNumber.cs
+
+├── 📄 20231014033643_AddMetadata.cs
+
+├── 📄 20231018021721_ActorAndTagToManyToMany.cs
+
+├── 📄 20231020025746_10_20_Rename.cs
+
+├── 📄 20231027015910_MetadataUpdate20231027.cs
+
+├── 📄 20231230014016_AddMaxLength20231230.cs
+
+├── 📄 20240102033309_Rename20240102.cs
+
+├── 📄 20240104064634_AddMaxLength20240104.cs
+
+├── 📄 20240521023253_20240521_EFFile_AddDuration.cs
+
+├── 📄 20240621082131_20240621_AddImageHash.cs
+
+├── 📄 20240624071931_20240624_EFDirectoryAddMaxLength.cs
+
+├── 📄 20240625030610_20240625_AddDbSet_Images.cs
+
+├── 📄 20240705090432_20240705_EFMetadata_RenameKey.cs
+
+├── 📄 20240913091227_20240913_EFImage_RemoveParent.cs
+
+├── 📄 20241115012740_20241115_AddIsCorrupted.cs
+
+├── 📄 20241120072449_20241120_EFFile_Add_MetadataProcessCount.cs
+
+├── 📄 20250106081054_20250106_AddIgnoreSerialNumbersTable.cs
+
+├── 📄 20250114071020_20250114_AddVideoInfoProperties.cs
+
+├── 📄 20250205074413_20250205_NewSerialNumbersTable.cs
+
+└── 📄 AppDbContextModelSnapshot.cs
