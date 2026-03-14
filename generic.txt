@@ -1,0 +1,165 @@
+/**
+ * 模擬 Java 提供的 HashMap, 但是操作不會 new 生命週期短的物件(比如 iterator).
+ * <p></p>
+ *
+ * 使用方法: <ol>
+ * <li> new instance 時, 審慎的給 bucket 的數量, 這會影響效率. 至於要給多少, 要測試才知道. </li>
+ * <li> 會受大小影響執行速度的 method: put(), clear(), containsKey(), get(), getPair(), remove(). </li>
+ * <li> 若是要取 HashMap 內全部的 Element, 可以用 getFirstXXXX() and getNextXXXX() 系列的 method 取得; 或是使用 for
+ *      each loop 取出每一個 key. </li>
+ * </ol>
+ */
+public class GHashMap<KEY, VALUE> implements Iterable<KEY>
+{
+    public class Pair
+    {
+        public KEY key = null;
+        public VALUE value = null;
+    }
+
+    // 沒有被使用的 Pair.
+    private GLinkList<Pair> mFreePairList = new GLinkList<Pair>();
+
+    private int mBucketNum = 8; // 有幾個水桶, 就是有幾個 LinkList 來記錄資料.
+    private Object[] mBucketArray = null; // 使用中的資料.
+    private int mSize = 0; // 內部有幾組 key,value.
+
+    // 此 LinkList 只用在 iteration.
+    private GLinkList<Pair> mIterators = new GLinkList<Pair>();
+
+    public GHashMap()
+    {
+        mBucketArray = new Object[mBucketNum];
+    }
+
+    /**
+     *
+     * @param bucket [in] 數值越大, 記憶體耗的越多, 但是速度越快.
+     */
+    public GHashMap(int bucket)
+    {
+        mBucketNum = bucket;
+        mBucketArray = new Object[mBucketNum];
+    }
+
+    @Override
+    public String toString()
+    {
+        return String.format("Size(%d)", mSize);
+    }
+
+    /**
+     * 註: 耗時的操作.
+     *
+     * @param key   [in]
+     * @param value [in]
+     * @return instance or null. 設定之前 key 是綁哪個 Value.
+     */
+    @SuppressWarnings("unchecked")
+    public VALUE put(@NotNull KEY key, @NotNull VALUE value)
+    {
+        // 檢查 key 是否已經存在了.
+        Pair pair = getPair(key);
+        if(null != pair)
+        {
+            // key 本身就設定了, 所以只需要修改數值.
+            VALUE ret = pair.value;
+//            pair.key = key;
+            pair.value = value;
+
+            return ret;
+        }
+
+        // key 不存在, 所以要加入新的 key.
+        int bucket = Math.abs(key.hashCode()) % mBucketNum;
+
+        if(null == mBucketArray[bucket])
+            mBucketArray[bucket] = new GLinkList<Pair>();
+
+        GLinkList<Pair> list = (GLinkList<Pair>)mBucketArray[bucket];
+        if(0 < mFreePairList.size())
+            pair = mFreePairList.removeFirst();
+        else
+            pair = new Pair();
+
+        pair.key = key;
+        pair.value = value;
+        list.addLast(pair);
+
+        ++mSize;
+
+        return null; // 因為是新的 key, 之前沒設定過, 所以給 null.
+    }
+    
+    
+    /**
+     * 註: 耗時的操作.
+     */
+    @SuppressWarnings("unchecked")
+    public void clear()
+    {
+        // 回收全部的 pair instance.
+        for(int i = 0; i < mBucketArray.length; i++)
+        {
+            GLinkList<Pair> list = (GLinkList<Pair>)mBucketArray[i];
+            if(null == list)
+                continue;
+
+            Pair pair = list.getFirst();
+            while(null != pair)
+            {
+                pair.key = null;
+                pair.value = null;
+                mFreePairList.addLast(pair);
+
+                pair = list.getNext();
+            }
+            list.clear();
+        }
+        mSize = 0;
+    }
+
+    /**
+     * HashMap 是否有此 Key ?
+     * <p></p>
+     *
+     * 註: 耗時的操作.
+     *
+     * @param key [in]
+     * @return
+     */
+    public boolean containsKey(@NotNull KEY key)
+    {
+        return null != get(key);
+    }
+
+    /**
+     * 取得某個 key 綁的 value. 假如根本沒有此 key, 也會回傳 null.
+     * <p></p>
+     *
+     * 註: 耗時的操作.
+     *
+     * @param key [in]
+     * @return null or instance.
+     */
+    @SuppressWarnings("unchecked")
+    public VALUE get(@NotNull KEY key)
+    {
+        int bucket = Math.abs(key.hashCode()) % mBucketNum;
+
+        if(null == mBucketArray[bucket])
+            return null;
+
+        // 輪尋找法.
+        GLinkList<Pair> list = (GLinkList<Pair>)mBucketArray[bucket];
+        Pair pair = list.getFirst();
+        while(null != pair)
+        {
+            if(key.equals(pair.key))
+                return pair.value;
+
+            pair = list.getNext();
+        }
+
+        return null;
+    }
