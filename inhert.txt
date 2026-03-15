@@ -1,57 +1,38 @@
 /**
-
  * The RenderSystem class provides a base interface which abstracts the general functionality of the 3D API e.g. Direct3D or
-
  * OpenGL. Whilst a few of the general methods have implementations, most of this class is abstract, requiring a subclass
-
  * based on a specific API to be constructed to provide the full functionality.
-
  * <p></p>
-
  *
-
  * 抽象的繪圖系統(抽象化 OpenGL and OpenGL ES API). 此類別不應該給遊戲開發者使用.
-
  * <p></p>
-
  *
-
  * 子類別:<ol>
-
  * <li> 提供 public 沒有參數的 constructor. 子類別並不會直接被 new, 而是用 Java Reflection 產生 instance, 參考 Root.initialize(). </li>
 
  * </ol>
-
  *
-
  * 實作細節 <ol>
-
  * <li> _updateAllRenderTarget() 是非常重要的 Method, 是每個 Frame 都要呼叫的 Method! 呼叫後, 我引發一連串的 Render Target
-
  * 被更新, 所以 Window RenderTarget, 特效用的 RenderTarget(Render To Texture 的效果有 Shadow Map) 都會被更新. </li>
-
  * </ol>
-
  */
 
 public abstract class RenderSystem implements IDestroy
-
-
+{
+...
+}
 
 public class LWJGLRenderSystem extends RenderSystem
-
 {
-
     private final FloatBuffer mFloat4Buffer = BufferUtils.createFloatBuffer(4);
-
     private FloatBuffer mFloat16Buffer = BufferUtils.createFloatBuffer(16);
-
-
+...
+}
 
 public class AndroidRenderSystem extends RenderSystem
-
 {
-
     private Matrix4 mWorldMatrix = new Matrix4();
-
     private Matrix4 mViewMatrix = new Matrix4();
+...
+}
